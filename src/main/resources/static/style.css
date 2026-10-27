@@ -1,0 +1,269 @@
+/* ==========================================
+   DIGITAL BOOKS - WARME BEIGE/BRUINE STIJL
+   ========================================== */
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(135deg, #f5efe6 0%, #e8dfd8 50%, #dcd0c0 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #3e2723;
+}
+
+/* Navigatiebalk */
+nav {
+    background-color: #4e342e;
+    color: #f5efe6;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+nav h2 {
+    cursor: pointer;
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-badge {
+    background-color: #3e2723;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #d7ccc8;
+}
+
+/* Hoofdcontainer */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Kaarten (Schermen) */
+.card {
+    background: #fffaf0;
+    border: 1px solid #d7ccc8;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(62, 39, 35, 0.08);
+    width: 100%;
+    text-align: center;
+}
+
+.card.left-align {
+    text-align: left;
+}
+
+h1, h2 {
+    color: #2c1810;
+    margin-bottom: 15px;
+}
+
+p {
+    color: #5d4037;
+    margin-bottom: 25px;
+    font-size: 1.05rem;
+}
+
+/* Formulier stijlen */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #4e342e;
+}
+
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #bcaaa4;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #ffffff;
+}
+
+input:focus {
+    outline: none;
+    border-color: #6d4c41;
+    box-shadow: 0 0 5px rgba(109, 76, 65, 0.3);
+}
+
+/* Knoppen */
+.btn {
+    background-color: #6d4c41;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn:hover {
+    background-color: #5d4c41;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: #388e3c;
+}
+.btn-success:hover {
+    background-color: #2e7d32;
+}
+
+.btn-danger {
+    background-color: #c62828;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+.btn-danger:hover {
+    background-color: #b71c1c;
+}
+
+.btn-secondary {
+    background-color: #8d6e63;
+}
+.btn-secondary:hover {
+    background-color: #795548;
+}
+
+/* Boeken Grid */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.book-card {
+    background: #ffffff;
+    border: 1px solid #d7ccc8;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+}
+
+.book-card h3 {
+    color: #3e2723;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #2e7d32;
+    margin: 10px 0;
+}
+
+/* Reservering Lijst */
+.reservation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #d7ccc8;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 5px;
+}
+.badge-confirmed { background-color: #c8e6c9; color: #2e7d32; }
+.badge-pending { background-color: #ffe0b2; color: #ef6c00; }
+
+.link-btn {
+    background: none;
+    border: none;
+    color: #6d4c41;
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 600;
+    margin-top: 15px;
+    font-size: 0.95rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    color: #6d4c41;
+    font-size: 0.85rem;
+}
+/* Hoeveelheid selector en knoppen */
+.quantity-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.qty-btn {
+    background-color: #e0d4c3;
+    border: 1px solid #bcaaa4;
+    color: #3e2723;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qty-btn:hover {
+    background-color: #d7ccc8;
+}
+
+.qty-input {
+    width: 45px;
+    text-align: center;
+    padding: 6px;
+    border: 1px solid #bcaaa4;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size

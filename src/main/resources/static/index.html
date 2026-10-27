@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Books</title>
+    <!-- Koppeling naar het losse CSS-bestand -->
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- Navigatiebalk (Zichtbaar na inloggen) -->
+<nav id="navbar" class="hidden">
+    <h2 onclick="showSection('catalog-section')">📚 Digital Books</h2>
+    <div class="nav-right">
+        <span id="user-display" class="user-badge"></span>
+        <button class="btn btn-secondary" onclick="showSection('reservations-section')">🎫 Mijn Reserveringen</button>
+        <button class="btn btn-danger" onclick="logout()">Uitloggen</button>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+
+    <!-- 1. WELKOMSTPAGINA -->
+    <div id="welcome-section" class="card">
+        <span style="font-size: 4rem; display: block; margin-bottom: 15px;">📖</span>
+        <h1>Digital Books</h1>
+        <p>Welkom bij onze online boekenwinkel. Ontdek prachtige boeken en beheer eenvoudig je reserveringen.</p>
+        <div style="display: flex; justify-content: center; gap: 15px;">
+            <button class="btn" onclick="showSection('login-section')">Inloggen</button>
+            <button class="btn btn-success" onclick="showSection('register-section')">Registreren</button>
+        </div>
+    </div>
+
+    <!-- 2. INLOGSCHERM -->
+    <div id="login-section" class="card left-align hidden">
+        <h2>Inloggen</h2>
+        <p>Vul je gebruikersnaam in om in te loggen.</p>
+
+        <div class="form-group">
+            <label>Gebruikersnaam:</label>
+            <input type="text" id="login-username" placeholder="Bijv. yasmina">
+        </div>
+        <div class="form-group">
+            <label>Wachtwoord:</label>
+            <input type="password" id="login-password" placeholder="Jouw wachtwoord">
+        </div>
+
+        <button class="btn" style="width: 100%;" onclick="login()">Inloggen</button>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="margin-bottom: 5px; font-size: 0.9rem;">Nog geen account?</p>
+            <button class="link-btn" onclick="showSection('register-section')">Maak hier een account aan</button>
+            <br>
+            <button class="link-btn" onclick="showSection('welcome-section')">← Terug naar start</button>
+        </div>
+        <p id="login-msg" style="margin-top: 15px; text-align: center; font-weight: bold; font-size: 0.9rem;"></p>
+    </div>
+
+    <!-- 3. REGISTRATIESCHERM -->
+    <div id="register-section" class="card left-align hidden">
+        <h2>Account Aanmaken</h2>
+        <p>Registreer een nieuw account om direct van start te gaan.</p>
+
+        <div class="form-group">
+            <label>Gebruikersnaam:</label>
+            <input type="text" id="reg-username" placeholder="Bijv. yasmina">
+        </div>
+        <div class="form-group">
+            <label>E-mailadres:</label>
+            <input type="email" id="reg-email" placeholder="naam@ehb.be">
+        </div>
+        <div class="form-group">
+            <label>Wachtwoord:</label>
+            <input type="password" id="reg-password" placeholder="Kies een wachtwoord">
+        </div>
+
+        <button class="btn btn-success" style="width: 100%;" onclick="register()">Registreren & Starten</button>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <p style="margin-bottom: 5px; font-size: 0.9rem;">Heb je al een account?</p>
+            <button class="link-btn" onclick="showSection('login-section')">Log hier in</button>
+            <br>
+            <button class="link-btn" onclick="showSection('welcome-section')">← Terug naar start</button>
+        </div>
+        <p id="reg-msg" style="margin-top: 15px; text-align: center; font-weight: bold; font-size: 0.9rem;"></p>
+    </div>
+
+    <!-- 4. CATALOGUS / BOEKENWEERGAVE -->
+    <div id="catalog-section" class="card left-align hidden">
+        <div style="border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
+            <h2>📖 Boekencatalogus</h2>
+            <p style="margin: 0; font-size: 0.95rem;">Bekijk ons assortiment en reserveer direct.</p>
+        </div>
+        <div id="book-grid" class="book-grid"></div>
+    </div>
+
+    <!-- 5. RESERVERINGEN PAGINA -->
+    <div id="reservations-section" class="card left-align hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
+            <div>
+                <h2>🎫 Mijn Reserveringen</h2>
+                <p style="margin: 0; font-size: 0.95rem;">Beheer hieronder je gereserveerde boeken.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="showSection('catalog-section')">← Terug naar Catalogus</button>
+        </div>
+        <div id="reservations-list"></div>
+    </div>
+
+</div>
+
+<footer>
+    &copy; 2026 Digital Books Examenproject
+</footer>
+
+<script>
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+    function updateUI() {
+        const navbar = document.getElementById('navbar');
+        if (currentUser) {
+            document.getElementById('user-display').innerText = '👤 ' + currentUser.gebruikersnaam;
+            navbar.classList.remove('hidden');
+        } else {
+            navbar.classList.add('hidden');
+        }
+    }
+
+    function showSection(sectionId) {
+        document.getElementById('welcome-section').classList.add('hidden');
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('register-section').classList.add('hidden');
+        document.getElementById('catalog-section').classList.add('hidden');
+        document.getElementById('reservations-section').classList.add('hidden');
+
+        document.getElementById(sectionId).classList.remove('hidden');
+
+        if (sectionId === 'catalog-section') loadBooks();
+        if (sectionId === 'reservations-section') loadReservations();
+    }
+
+    function register() {
+        const username = document.getElementById('reg-username').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+
+        if (!username) {
+            alert('Vul een gebruikersnaam in.');
+            return;
+        }
+
+        fetch('/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gebruikersnaam: username, email: email, wachtwoord: password })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Registratie mislukt');
+                return res.json();
+            })
+            .then(user => {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUI();
+                showSection('catalog-section');
+            })
+            .catch(err => {
+                const msg = document.getElementById('reg-msg');
+                msg.innerText = 'Registratie mislukt: ' + err.message;
+                msg.style.color = '#c62828';
+            });
+    }
+
+    function login() {
+        const username = document.getElementById('login-username').value.trim();
+
+        if (!username) {
+            alert('Vul je gebruikersnaam in om in te loggen.');
+            return;
+        }
+
+        fetch('/api/users/find?username=' + encodeURIComponent(username))
+            .then(res => {
+                if (!res.ok) throw new Error('Gebruiker niet gevonden. Registreer eerst!');
+                return res.json();
+            })
+            .then(user => {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUI();
+                showSection('catalog-section');
+            })
+            .catch(err => {
+                const msg = document.getElementById('login-msg');
+                msg.innerText = err.message;
+                msg.style.color = '#c62828';
+            });
+    }
+
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        updateUI();
+        showSection('welcome-section');
+    }
+
+    function loadBooks() {
+        fetch('/api/books')
+            .then(res => res.json())
+            .then(books => {
+                const grid = document.getElementById('book-grid');
+                grid.innerHTML = '';
+                if (books.length === 0) {
+                    grid.innerHTML = '<p>Geen boeken gevonden in de database.</p>';
+                    return;
+                }
+                books.forEach(book => {
+                    const isAvailable = book.stock > 0;
+                    grid.innerHTML += `
+                        <div class="book-card">
+                            <div>
+                                <h3>${book.titel}</h3>
+                                <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Auteur:</strong> ${book.auteur}</p>
+                                <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 15px;">${book.omschrijving || 'Geen omschrijving'}</p>
+                            </div>
+                            <div>
+                                <div class="price">€${book.prijs.toFixed(2)}</div>
+                                <p style="font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: ${isAvailable ? '#2e7d32' : '#c62828'};">
+                                    Stock: ${book.stock} stuks
+                                </p>
+
+                                <div class="quantity-container">
+                                    <span style="font-size: 0.9rem; font-weight: 600;">Hoev.:</span>
+                                    <button class="qty-btn" onclick="changeQty(${book.id}, -1, ${book.stock})">-</button>
+                                    <input type="number" id="qty-${book.id}" class="qty-input" value="1" min="1" max="${book.stock}" readonly>
+                                    <button class="qty-btn" onclick="changeQty(${book.id}, 1, ${book.stock})">+</button>
+                                </div>
+
+                                <button class="btn-winkelwagen" onclick="reserveBook(${book.id})" ${!isAvailable ? 'disabled' : ''}>
+                                    ${isAvailable ? 'TOEVOEGEN AAN WINKELWAGEN' : 'UITVERKOCHT'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+    }
+
+    function changeQty(bookId, change, maxStock) {
+        const input = document.getElementById(`qty-${bookId}`);
+        let currentVal = parseInt(input.value);
+        currentVal += change;
+        if (currentVal < 1) currentVal = 1;
+        if (currentVal > maxStock) currentVal = maxStock;
+        input.value = currentVal;
+    }
+
+    function reserveBook(bookId) {
+        if (!currentUser) {
+            alert('Je moet eerst inloggen!');
+            showSection('login-section');
+            return;
+        }
+
+        const aantal = document.getElementById(`qty-${bookId}`).value;
+
+        fetch(`/api/reservations?userId=${currentUser.id}&bookId=${bookId}&aantal=${aantal}`, {
+            method: 'POST'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Reservering mislukt');
+                return res.json();
+            })
+            .then(() => {
+                showSection('reservations-section');
+            })
+            .catch(err => alert(err.message));
+    }
+
+    function loadReservations() {
+        if (!currentUser) return;
+
+        fetch('/api/reservations')
+            .then(res => res.json())
+            .then(reservations => {
+                const list = document.getElementById('reservations-list');
+                list.innerHTML = '';
+
+                const userReservations = reservations.filter(r => r.user && r.user.id === currentUser.id);
+
+                if (userReservations.length === 0) {
+                    list.innerHTML = '<p>Je hebt nog geen reserveringen gemaakt.</p>';
+                    return;
+                }
+
+                userReservations.forEach(r => {
+                    const statusBadge = r.bevestigd
+                        ? '<span class="badge badge-confirmed">Bevestigd</span>'
+                        : '<span class="badge badge-pending">In afwachting</span>';
+
+                    list.innerHTML += `
+                        <div class="reservation-item">
+                            <div>
+                                <strong style="font-size: 1.1rem; color: #2c1810;">${r.book ? r.book.titel : 'Boek'}</strong>
+                                <p style="margin: 3px 0 0 0; font-size: 0.9rem;">Aantal: ${r.aantal}</p>
+                                <div>${statusBadge}</div>
+                            </div>
+                            <button class="btn btn-danger" onclick="cancelReservation(${r.id})">🗑️ Verwijderen</button>
+                        </div>
+                    `;
+                });
+            });
+    }
+
+    function cancelReservation(reservationId) {
+        if (confirm('Weet je zeker dat je deze reservering wilt verwijderen?')) {
+            fetch('/api/reservations/' + reservationId, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) {
+                        loadReservations();
+                    } else {
+                        alert('Kon reservering niet verwijderen.');
+                    }
+                });
+        }
+    }
+
+    // Init opstart
+    updateUI();
+    if (currentUser) {
+        showSection('catalog-section');
+    } else {
+        showSection('welcome-section');
+    }
+</script>
+</body>
+</html>
