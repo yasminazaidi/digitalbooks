@@ -15,10 +15,15 @@ body {
     display: flex;
     flex-direction: column;
     color: #3e2723;
+    padding-top: 80px;
 }
 
 /* Navigatiebalk */
 nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     background-color: #4e342e;
     color: #f5efe6;
     padding: 15px 30px;
@@ -26,12 +31,15 @@ nav {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    box-sizing: border-box;
 }
 
 nav h2 {
     cursor: pointer;
     font-size: 1.4rem;
     letter-spacing: 0.5px;
+    margin: 0;
 }
 
 .nav-right {
