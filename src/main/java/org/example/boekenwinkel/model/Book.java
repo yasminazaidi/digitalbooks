@@ -3,7 +3,7 @@ package org.example.boekenwinkel.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "books")
+@Table(name = "book")
 public class Book {
 
     @Id
@@ -11,16 +11,27 @@ public class Book {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String isbn; // Toegevoegd voor de eisen
+    private String isbn;
 
     private String titel;
     private String auteur;
-
-    @Column(length = 1000)
     private String omschrijving;
+    private Double prijs;
+    private Integer stock;
 
-    private double prijs;
-    private int stock;
+    // 1. Standaard lege constructor (verplicht voor JPA)
+    public Book() {
+    }
+
+    // 2. Constructor met parameters zodat je testen en inserts lukken
+    public Book(String isbn, String titel, String auteur, String omschrijving, Double prijs, Integer stock) {
+        this.isbn = isbn;
+        this.titel = titel;
+        this.auteur = auteur;
+        this.omschrijving = omschrijving;
+        this.prijs = prijs;
+        this.stock = stock;
+    }
 
     // Getters en Setters
     public Long getId() { return id; }
@@ -38,9 +49,9 @@ public class Book {
     public String getOmschrijving() { return omschrijving; }
     public void setOmschrijving(String omschrijving) { this.omschrijving = omschrijving; }
 
-    public double getPrijs() { return prijs; }
-    public void setPrijs(double prijs) { this.prijs = prijs; }
+    public Double getPrijs() { return prijs; }
+    public void setPrijs(Double prijs) { this.prijs = prijs; }
 
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
+    public Integer getStock() { return stock; }
+    public void setStock(Integer stock) { this.stock = stock; }
 }

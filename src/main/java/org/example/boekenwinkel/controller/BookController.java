@@ -1,9 +1,9 @@
 package org.example.boekenwinkel.controller;
 
 import org.example.boekenwinkel.model.Book;
+import org.example.boekenwinkel.repository.BookRepository;
 import org.example.boekenwinkel.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,18 +13,14 @@ import java.util.List;
 public class BookController {
 
     @Autowired
-    private BookService bookService;
+    private BookRepository bookRepository;
+
+    @Autowired
+    private BookService bookService; // <--- Deze ontbrak en zorgt voor de fout
 
     @GetMapping
     public List<Book> getAllBooks() {
-        return bookService.getAllBooks();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        return bookService.getBookById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return bookRepository.findAll();
     }
 
     @PostMapping
