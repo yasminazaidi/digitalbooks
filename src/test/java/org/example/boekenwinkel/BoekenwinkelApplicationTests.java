@@ -38,11 +38,17 @@ class BoekenwinkelApplicationTests {
     // Test 2: Controleer of een gebruiker correct wordt geregistreerd
     @Test
     void testUserRegistration() {
-        User user = new User("testgebruiker", "test@email.com", "geheim123");
+        // Maak een nieuwe User aan met de lege constructor en set de waardes apart
+        User user = new User();
+        user.setUsername("testgebruiker");
+        user.setEmail("test@email.com");
+        user.setPassword("geheim123");
+
         User savedUser = userRepository.save(user);
 
+        // Controleer of hij correct is opgeslagen
         assertNotNull(savedUser.getId());
-        assertEquals("testgebruiker", savedUser.getGebruikersnaam());
+        assertEquals("testgebruiker", savedUser.getUsername());
     }
 
     // Test 3: KRITIEKE FEATURE - Controleer of de stock van het boek vermindert bij reservering/bevestiging

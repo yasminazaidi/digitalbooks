@@ -153,7 +153,7 @@
         fetch('/api/users/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ gebruikersnaam: username, email: email, wachtwoord: password })
+            body: JSON.stringify({ username: username, email: email, password: password }) // <--- Aangepast naar Engels
         })
             .then(res => {
                 if (!res.ok) throw new Error('Registratie mislukt');
