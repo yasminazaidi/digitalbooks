@@ -1,36 +1,28 @@
 package org.example.boekenwinkel.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "books")
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String isbn;
+    @Column(unique = true, nullable = false)
+    private String isbn; // Toegevoegd voor de eisen
+
     private String titel;
     private String auteur;
+
+    @Column(length = 1000)
     private String omschrijving;
+
     private double prijs;
     private int stock;
 
-    public Book() {
-    }
-
-    public Book(String isbn, String titel, String auteur, String omschrijving, double prijs, int stock) {
-        this.isbn = isbn;
-        this.titel = titel;
-        this.auteur = auteur;
-        this.omschrijving = omschrijving;
-        this.prijs = prijs;
-        this.stock = stock;
-    }
-
+    // Getters en Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -52,4 +44,3 @@ public class Book {
     public int getStock() { return stock; }
     public void setStock(int stock) { this.stock = stock; }
 }
-

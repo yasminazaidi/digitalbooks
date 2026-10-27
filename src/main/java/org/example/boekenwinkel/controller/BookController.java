@@ -1,7 +1,9 @@
 package org.example.boekenwinkel.controller;
 
 import org.example.boekenwinkel.model.Book;
-import org.example.boekenwinkel.repository.BookRepository;
+import org.example.boekenwinkel.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,21 +12,23 @@ import java.util.List;
 @RequestMapping("/api/books")
 public class BookController {
 
-    private final BookRepository bookRepository;
+    @Autowired
+    private BookService bookService;
 
-    public BookController(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
-
-    // 1. Alle boeken opvragen
     @GetMapping
     public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+        return bookService.getAllBooks();
     }
 
-    // 2. Een nieuw boek toevoegen
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        return bookService.getBookById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     public Book createBook(@RequestBody Book book) {
-        return bookRepository.save(book);
+        return bookService.saveBook(book);
     }
 }
