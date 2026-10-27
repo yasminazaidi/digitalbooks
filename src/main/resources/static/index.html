@@ -269,14 +269,17 @@
         fetch(`/api/reservations?userId=${currentUser.id}&bookId=${bookId}&aantal=${aantal}`, {
             method: 'POST'
         })
-            .then(res => {
-                if (!res.ok) throw new Error('Reservering mislukt');
-                return res.json();
+            .then(async res => {
+                const text = await res.text();
+                if (!res.ok) {
+                   throw new Error(text || 'Reserving mislukt');
+                }
+                return text ? JSON.parse(text) : {};
             })
             .then(() => {
                 showSection('reservations-section');
             })
-            .catch(err => alert(err.message));
+            .catch(err => alert(' Fout bij reserveren: ' + err.message));
     }
 
     function loadReservations() {

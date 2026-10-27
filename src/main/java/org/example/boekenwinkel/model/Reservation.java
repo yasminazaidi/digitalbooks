@@ -31,6 +31,25 @@ public class Reservation {
         this.aantal = aantal;
         this.bevestigd = false; // Standaard nog niet bevestigd
         this.reserveringsDatum = LocalDateTime.now();
+
+    }
+    // --- VOEG DIT TOE AAN JE RESERVATION KLASSE ---
+    private String afhaalDatum;
+    private String afhaalTijd;
+
+    // Getters en setters
+    public String getAfhaalDatum() {
+        return afhaalDatum;
+    }
+    public void setAfhaalDatum(String afhaalDatum) {
+        this.afhaalDatum = afhaalDatum;
+    }
+
+    public String getAfhaalTijd() {
+        return afhaalTijd;
+    }
+    public void setAfhaalTijd(String afhaalTijd) {
+        this.afhaalTijd = afhaalTijd;
     }
 
     public Long getId() { return id; }

@@ -58,11 +58,11 @@ nav h2 {
 
 /* Hoofdcontainer */
 .container {
-    max-width: 900px;
-    margin: 40px auto;
+    margin: 20px 0;
     padding: 20px;
     flex-grow: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -76,7 +76,19 @@ nav h2 {
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(62, 39, 35, 0.08);
     width: 100%;
+    max-width: 500px;
     text-align: center;
+    box-sizing: border-box;
+}
+/* catalog-section en reservations-section vullen het hele scherm van links naar rechts */
+#catalog-section,
+#reservations-section {
+    max-width: 100% !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 40px !important;
 }
 
 .card.left-align {
@@ -275,4 +287,31 @@ footer {
     border-radius: 6px;
     font-weight: bold;
     font-size: medium;
+}
+/* Stijl voor de winkelwagenknop met een bruine rand */
+.btn-winkelwagen {
+    background-color: #fffaf0;
+    color: #4e342e;
+    border: 2px solid #4e342e; /* Dit zorgt voor de bruine rand */
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+    transition: all 0.2s ease;
+}
+
+/* Effect wanneer je er met de muis overgaat */
+.btn-winkelwagen:hover:not(:disabled) {
+    background-color: #4e342e;
+    color: #fffaf0;
+}
+
+/* Stijl voor wanneer het boek uitverkocht is (disabled) */
+.btn-winkelwagen:disabled {
+    background-color: #f5f2eb;
+    border: 2px solid #d7ccc8;
+    color: #bcaaa4;
+    cursor: not-allowed;
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Boekenwinkel</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body>
+<div style="padding: 30px;">
+    <h1>🔧 Beheerdersdashboard</h1>
+    <p>Welkom beheerder! Hier kun je alle gebruikers en reserveringen beheren.</p>
+
+    <p><a href="/" style="text-decoration: underline; color: blue;">← Terug naar de winkel</a></p>
+
+    <hr style="margin: 20px 0;">
+
+    <h2>👥 Overzicht van alle Gebruikers</h2>
+    <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%; margin-bottom: 30px;">
+        <thead>
+        <tr style="background-color: #f2f2f2;">
+            <th>ID</th>
+            <th>Gebruikersnaam</th>
+            <th>E-mail</th>
+            <th>Rol</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${users}">
+            <td th:text="${u.id}">1</td>
+            <td th:text="${u.username}">Naam</td>
+            <td th:text="${u.email}">email@test.com</td>
+            <td th:text="${u.role}">USER</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>📦 Overzicht van alle Reserveringen & Afhaaltijden</h2>
+    <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%;">
+        <thead>
+        <tr style="background-color: #f2f2f2;">
+            <th>Reservering ID</th>
+            <th>Gebruiker</th>
+            <th>Boek</th>
+            <th>Aantal</th>
+            <th>Huidige Afhaaltijd</th>
+            <th>Nieuwe Afhaaltijd Instellen</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="res : ${reservations}">
+            <td th:text="${res.id}">1</td>
+            <td th:text="${res.user != null ? res.user.username : 'Onbekend'}">Gebruiker</td>
+            <td th:text="${res.book != null ? res.book.title : 'Onbekend'}">Boek</td>
+            <td th:text="${res.aantal}">1</td>
+            <td>
+                <span th:if="${res.afhaalDatum != null}" th:text="${res.afhaalDatum + ' om ' + res.afhaalTijd}">Nog niet ingesteld</span>
+                <span th:if="${res.afhaalDatum == null}" style="color: red;">Nog niet ingesteld</span>
+            </td>
+            <td>
+                <!-- Formulier om afhaaldatum en -tijd op te slaan -->
+                <form th:action="@{/admin/reservation/update-pickup/{id}(id=${res.id})}" method="post" style="display: flex; gap: 5px;">
+                    <input type="date" name="afhaalDatum" th:value="${res.afhaalDatum}" required />
+                    <input type="time" name="afhaalTijd" th:value="${res.afhaalTijd}" required />
+                    <button type="submit" style="background-color: #4e342e; color: white; border: none; padding: 5px 10px; cursor: pointer;">Opslaan</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
