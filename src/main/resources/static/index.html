@@ -26,17 +26,16 @@
     <div id="welcome-section" class="card">
         <span style="font-size: 4rem; display: block; margin-bottom: 15px;">📖</span>
         <h1>Digital Books</h1>
-        <p>Welkom bij onze online boekenwinkel. Ontdek prachtige boeken en beheer eenvoudig je reserveringen.</p>
+        <p>Welkom bij onze online boekenwinkel. Log in om boeken te ontdekken en reserveringen te beheren.</p>
         <div style="display: flex; justify-content: center; gap: 15px;">
             <button class="btn" onclick="showSection('login-section')">Inloggen</button>
-            <button class="btn btn-success" onclick="showSection('register-section')">Registreren</button>
         </div>
     </div>
 
     <!-- 2. INLOGSCHERM -->
     <div id="login-section" class="card left-align hidden">
         <h2>Inloggen</h2>
-        <p>Vul je gebruikersnaam in om in te loggen.</p>
+        <p>Vul je gebruikersnaam en wachtwoord in om in te loggen.</p>
 
         <div class="form-group">
             <label>Gebruikersnaam:</label>
@@ -50,44 +49,12 @@
         <button class="btn" style="width: 100%;" onclick="login()">Inloggen</button>
 
         <div style="text-align: center; margin-top: 20px;">
-            <p style="margin-bottom: 5px; font-size: 0.9rem;">Nog geen account?</p>
-            <button class="link-btn" onclick="showSection('register-section')">Maak hier een account aan</button>
-            <br>
             <button class="link-btn" onclick="showSection('welcome-section')">← Terug naar start</button>
         </div>
         <p id="login-msg" style="margin-top: 15px; text-align: center; font-weight: bold; font-size: 0.9rem;"></p>
     </div>
 
-    <!-- 3. REGISTRATIESCHERM -->
-    <div id="register-section" class="card left-align hidden">
-        <h2>Account Aanmaken</h2>
-        <p>Registreer een nieuw account om direct van start te gaan.</p>
-
-        <div class="form-group">
-            <label>Gebruikersnaam:</label>
-            <input type="text" id="reg-username" placeholder="Bijv. yasmina">
-        </div>
-        <div class="form-group">
-            <label>E-mailadres:</label>
-            <input type="email" id="reg-email" placeholder="naam@ehb.be">
-        </div>
-        <div class="form-group">
-            <label>Wachtwoord:</label>
-            <input type="password" id="reg-password" placeholder="Kies een wachtwoord">
-        </div>
-
-        <button class="btn btn-success" style="width: 100%;" onclick="register()">Registreren & Starten</button>
-
-        <div style="text-align: center; margin-top: 20px;">
-            <p style="margin-bottom: 5px; font-size: 0.9rem;">Heb je al een account?</p>
-            <button class="link-btn" onclick="showSection('login-section')">Log hier in</button>
-            <br>
-            <button class="link-btn" onclick="showSection('welcome-section')">← Terug naar start</button>
-        </div>
-        <p id="reg-msg" style="margin-top: 15px; text-align: center; font-weight: bold; font-size: 0.9rem;"></p>
-    </div>
-
-    <!-- 4. CATALOGUS / BOEKENWEERGAVE -->
+    <!-- 3. CATALOGUS / BOEKENWEERGAVE -->
     <div id="catalog-section" class="card left-align hidden">
         <div style="border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
             <h2>📖 Boekencatalogus</h2>
@@ -96,7 +63,7 @@
         <div id="book-grid" class="book-grid"></div>
     </div>
 
-    <!-- 5. RESERVERINGEN PAGINA -->
+    <!-- 4. RESERVERINGEN PAGINA -->
     <div id="reservations-section" class="card left-align hidden">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
             <div>
@@ -120,7 +87,7 @@
     function updateUI() {
         const navbar = document.getElementById('navbar');
         if (currentUser) {
-            document.getElementById('user-display').innerText = '👤 ' + currentUser.gebruikersnaam;
+            document.getElementById('user-display').innerText = '👤 ' + currentUser.username;
             navbar.classList.remove('hidden');
         } else {
             navbar.classList.add('hidden');
@@ -130,7 +97,6 @@
     function showSection(sectionId) {
         document.getElementById('welcome-section').classList.add('hidden');
         document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('register-section').classList.add('hidden');
         document.getElementById('catalog-section').classList.add('hidden');
         document.getElementById('reservations-section').classList.add('hidden');
 
@@ -138,38 +104,6 @@
 
         if (sectionId === 'catalog-section') loadBooks();
         if (sectionId === 'reservations-section') loadReservations();
-    }
-
-    function register() {
-        const username = document.getElementById('reg-username').value.trim();
-        const email = document.getElementById('reg-email').value.trim();
-        const password = document.getElementById('reg-password').value;
-
-        if (!username) {
-            alert('Vul een gebruikersnaam in.');
-            return;
-        }
-
-        fetch('/api/users/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: username, email: email, password: password }) // <--- Aangepast naar Engels
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Registratie mislukt');
-                return res.json();
-            })
-            .then(user => {
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                updateUI();
-                showSection('catalog-section');
-            })
-            .catch(err => {
-                const msg = document.getElementById('reg-msg');
-                msg.innerText = 'Registratie mislukt: ' + err.message;
-                msg.style.color = '#c62828';
-            });
     }
 
     function login() {
@@ -182,7 +116,7 @@
 
         fetch('/api/users/find?username=' + encodeURIComponent(username))
             .then(res => {
-                if (!res.ok) throw new Error('Gebruiker niet gevonden. Registreer eerst!');
+                if (!res.ok) throw new Error('Gebruiker niet gevonden!');
                 return res.json();
             })
             .then(user => {
@@ -272,14 +206,14 @@
             .then(async res => {
                 const text = await res.text();
                 if (!res.ok) {
-                   throw new Error(text || 'Reserving mislukt');
+                    throw new Error(text || 'Reservering mislukt');
                 }
                 return text ? JSON.parse(text) : {};
             })
             .then(() => {
                 showSection('reservations-section');
             })
-            .catch(err => alert(' Fout bij reserveren: ' + err.message));
+            .catch(err => alert('Fout bij reserveren: ' + err.message));
     }
 
     function loadReservations() {
