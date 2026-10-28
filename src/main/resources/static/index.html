@@ -347,24 +347,32 @@
             .then(reservations => {
                 const list = document.getElementById('reservations-list');
                 list.innerHTML = '';
+                // Als de gebruiker ADMIN is, toon ALLE reserveringen. Anders alleen die van de ingelogde gebruiker.
+                const targetReservations = (currentUser.role === 'ADMIN')
+                    ? reservations
+                    : reservations.filter(r => r.user && r.user.id === currentUser.id);
 
-                const userReservations = reservations.filter(r => r.user && r.user.id === currentUser.id);
-
-                if (userReservations.length === 0) {
-                    list.innerHTML = '<p>Je hebt nog geen reserveringen gemaakt.</p>';
+                if (targetReservations.length === 0) {
+                    list.innerHTML = '<p>Geen reserveringen gevonden.</p>';
                     return;
                 }
 
-                userReservations.forEach(r => {
+                targetReservations.forEach(r => {
                     const statusBadge = r.bevestigd
                         ? '<span class="badge badge-confirmed">Bevestigd</span>'
                         : '<span class="badge badge-pending">In afwachting</span>';
+
+                    // Als het een admin is, tonen we ook welke gebruiker de reservering heeft gemaakt
+                    const userInfo = (currentUser.role === 'ADMIN' && r.user)
+                        ? `<br><small style="color: #6d4c41;">Reservering van: <strong>${r.user.username}</strong></small>`
+                        : '';
 
                     list.innerHTML += `
                         <div class="reservation-item">
                             <div>
                                 <strong style="font-size: 1.1rem; color: #2c1810;">${r.book ? r.book.titel : 'Boek'}</strong>
                                 <p style="margin: 3px 0 0 0; font-size: 0.9rem;">Aantal: ${r.aantal}</p>
+                                ${userInfo}
                                 <div>${statusBadge}</div>
                             </div>
                             <button class="btn btn-danger" onclick="cancelReservation(${r.id})">🗑️ Verwijderen</button>
