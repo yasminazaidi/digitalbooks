@@ -471,30 +471,58 @@
 
                 targetReservations.forEach(r => {
                     const statusBadge = r.bevestigd
-                        ? '<span class="badge badge-confirmed">Bevestigd</span>'
-                        : '<span class="badge badge-pending">In afwachting</span>';
+                        ? '<span class="badge badge-confirmed" style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-weight: bold;">🟢 Goedgekeurd / Mag ophalen</span>'
+                        : '<span class="badge badge-pending" style="background: #fff3e0; color: #e65100; padding: 4px 8px; border-radius: 4px; font-weight: bold;">⏳ In afwachting</span>';
 
                     const userInfo = (currentUser.role === 'ADMIN' && r.user)
                         ? `<br><small style="color: #6d4c41;">Reservering van: <strong>${r.user.username}</strong></small>`
                         : '';
 
+                    let adminActions = '';
+                    if (currentUser.role === 'ADMIN') {
+                        if (!r.bevestigd) {
+                            adminActions = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.85rem;" onclick="confirmReservation(${r.id})">✅ Zet op: Mag ophalen</button>`;
+                        } else {
+                            adminActions = `<span style="font-size: 0.85rem; color: #2e7d32; font-weight: bold;">✔ Klaar voor afhalen</span>`;
+                        }
+                    } else {
+                        adminActions = `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.85rem;" onclick="cancelReservation(${r.id})">🗑️ Annuleren</button>`;
+                    }
+
                     list.innerHTML += `
-                        <div class="reservation-item">
+                        <div class="reservation-item" style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e0e0e0;">
                             <div>
                                 <strong style="font-size: 1.1rem; color: #2c1810;">${r.book ? r.book.titel : 'Boek'}</strong>
                                 <p style="margin: 3px 0 0 0; font-size: 0.9rem;">Aantal: ${r.aantal}</p>
                                 ${userInfo}
-                                <div>${statusBadge}</div>
+                                <div style="margin-top: 8px;">${statusBadge}</div>
                             </div>
-                            <button class="btn btn-danger" onclick="cancelReservation(${r.id})">🗑️ Verwijderen</button>
+                            <div>
+                                ${adminActions}
+                            </div>
                         </div>
                     `;
                 });
             });
     }
 
+    function confirmReservation(reservationId) {
+        fetch('/api/reservations/' + reservationId + '/confirm', {
+            method: 'PATCH'
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert('Status bijgewerkt naar "Mag ophalen" en er is automatisch een bericht gestuurd naar de gebruiker!');
+                    loadReservations();
+                } else {
+                    alert('Kon de status niet bijwerken.');
+                }
+            })
+            .catch(err => console.error('Fout:', err));
+    }
+
     function cancelReservation(reservationId) {
-        if (confirm('Weet je zeker dat je deze reservering wilt verwijderen?')) {
+        if (confirm('Weet je zeker dat je deze reservering wilt annuleren?')) {
             fetch('/api/reservations/' + reservationId, { method: 'DELETE' })
                 .then(res => {
                     if (res.ok) {
