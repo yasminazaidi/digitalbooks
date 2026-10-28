@@ -141,11 +141,11 @@
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Score (1 t/m 5 sterren):</label>
                 <select id="review-score" style="width: 100%; padding: 8px; border: 1px solid #d7ccc8; border-radius: 6px;">
-                    <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-                    <option value="4">⭐⭐⭐⭐ (4)</option>
-                    <option value="3">⭐⭐⭐ (3)</option>
-                    <option value="2">⭐⭐ (2)</option>
-                    <option value="1">⭐ (1)</option>
+                    <option value="5">⭐⭐⭐⭐⭐ </option>
+                    <option value="4">⭐⭐⭐⭐ </option>
+                    <option value="3">⭐⭐⭐ </option>
+                    <option value="2">⭐⭐ </option>
+                    <option value="1">⭐ </option>
                 </select>
             </div>
             <div style="margin-bottom: 15px;">
@@ -612,11 +612,26 @@
     }
 
     function submitReviewAction() {
-        const score = document.getElementById('review-score').value;
-        const tekst = document.getElementById('review-text').value.trim();
+        const scoreElement = document.getElementById('review-score');
+        const textElement = document.getElementById('review-text');
+
+        // Controleer of de elementen wel bestaan op deze pagina
+        if (!scoreElement || !textElement) {
+            console.error("Review formulier elementen niet gevonden op de pagina.");
+            return;
+        }
+
+        const score = scoreElement.value;
+        const tekst = textElement.value.trim();
 
         if (!tekst) {
-            alert("Schrijf alstublieft een korte beoordeling.");
+            console.warn("Schrijf alstublieft een korte beoordeling.");
+            return;
+        }
+
+        // Controleer of currentUser en activeReviewBookId bestaan
+        if (typeof currentUser === 'undefined' || typeof activeReviewBookId === 'undefined') {
+            console.error("Gebruiker of Boek ID is niet gedefinieerd.");
             return;
         }
 
@@ -625,13 +640,23 @@
         })
             .then(res => {
                 if (res.ok) {
-                    alert("Bedankt! Je review is succesvol geplaatst.");
-                    closeReviewModal();
+                    // Maak het tekstveld leeg
+                    textElement.value = '';
+
+                    // Sluit de modal alleen als de functie bestaat
+                    if (typeof closeReviewModal === 'function') {
+                        closeReviewModal();
+                    }
+
+                    // Herlaad de reviews alleen als de functie bestaat
+                    if (typeof loadReviews === 'function') {
+                        loadReviews();
+                    }
                 } else {
-                    alert("Fout bij het plaatsen van de review.");
+                    console.error("Fout bij het plaatsen van de review.");
                 }
             })
-            .catch(err => alert("Fout: " + err.message));
+            .catch(err => console.error("Fout: " + err.message));
     }
 
     function showBookDetails(bookId, bookTitle) {
