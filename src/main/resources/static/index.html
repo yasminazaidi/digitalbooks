@@ -15,7 +15,7 @@
     <div class="nav-right">
         <span id="user-display" class="user-badge"></span>
         <button id="admin-nav-btn" class="btn btn-warning hidden" onclick="showSection('admin-section')">⚙️ Admin Beheer</button>
-        <button class="btn btn-secondary" onclick="showSection('reservations-section')">🎫 Mijn Reserveringen</button>
+        <button class="btn btn-secondary" onclick="showSection('reservations-section')">Reserveringen</button>
         <button class="btn btn-danger" onclick="logout()">Uitloggen</button>
     </div>
 </nav>
@@ -71,7 +71,7 @@
     <div id="reservations-section" class="card left-align hidden">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
             <div>
-                <h2>🎫 Mijn Reserveringen</h2>
+                <h2>Mijn Reserveringen</h2>
                 <p style="margin: 0; font-size: 0.95rem;">Beheer hieronder je reserveringen en schrijf reviews bij goedgekeurde boeken.</p>
             </div>
             <button class="btn btn-secondary" onclick="showSection('catalog-section')">← Terug naar Catalogus</button>
@@ -274,8 +274,16 @@
         const password = document.getElementById('admin-new-password').value;
         const role = document.getElementById('admin-new-role').value;
 
+        // Optioneel: toon een foutmelding op het scherm in plaats van een alert
+        const messageContainer = document.getElementById('admin-user-message');
+
         if (!username || !password) {
-            alert('Vul minimaal een gebruikersnaam en wachtwoord in.');
+            if (messageContainer) {
+                messageContainer.innerText = 'Vul minimaal een gebruikersnaam en wachtwoord in.';
+                messageContainer.style.color = 'red';
+            } else {
+                console.error('Vul minimaal een gebruikersnaam en wachtwoord in.');
+            }
             return;
         }
 
@@ -289,28 +297,43 @@
                 return res.json();
             })
             .then(() => {
-                alert('Gebruiker aangemaakt!');
+
                 document.getElementById('admin-new-username').value = '';
                 document.getElementById('admin-new-email').value = '';
                 document.getElementById('admin-new-password').value = '';
+
+
+                if (messageContainer) {
+                    messageContainer.innerText = 'Gebruiker succesvol aangemaakt!';
+                    messageContainer.style.color = 'green';
+                }
+
                 loadAdminUsers();
                 loadUsersForMessage();
             })
-            .catch(err => alert(err.message));
+            .catch(err => {
+                if (messageContainer) {
+                    messageContainer.innerText = err.message;
+                    messageContainer.style.color = 'red';
+                } else {
+                    console.error(err.message);
+                }
+            });
     }
 
     function adminDeleteUser(id) {
-        if (confirm('Weet je zeker dat je deze gebruiker wilt verwijderen?')) {
-            fetch('/api/users/' + id, { method: 'DELETE' })
-                .then(res => {
-                    if (res.ok) {
-                        loadAdminUsers();
-                        loadUsersForMessage();
-                    } else {
-                        alert('Kon gebruiker niet verwijderen.');
-                    }
-                });
-        }
+        fetch('/api/users/' + id, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) {
+                    loadAdminUsers();
+                    loadUsersForMessage();
+                } else {
+                    console.error('Kon gebruiker niet verwijderen.');
+                }
+            })
+            .catch(error => {
+                console.error('Er is een fout opgetreden:', error);
+            });
     }
 
     /* --- BERICHTENSYSTEEM --- */
