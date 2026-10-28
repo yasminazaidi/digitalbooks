@@ -14,6 +14,7 @@
     <h2 onclick="showSection('catalog-section')">📚 Digital Books</h2>
     <div class="nav-right">
         <span id="user-display" class="user-badge"></span>
+        <button id="admin-nav-btn" class="btn btn-warning hidden" onclick="showSection('admin-section')">⚙️ Admin Beheer</button>
         <button class="btn btn-secondary" onclick="showSection('reservations-section')">🎫 Mijn Reserveringen</button>
         <button class="btn btn-danger" onclick="logout()">Uitloggen</button>
     </div>
@@ -39,7 +40,7 @@
 
         <div class="form-group">
             <label>Gebruikersnaam:</label>
-            <input type="text" id="login-username" placeholder="Bijv. yasmina">
+            <input type="text" id="login-username" placeholder="Bijv. admin of yasmina">
         </div>
         <div class="form-group">
             <label>Wachtwoord:</label>
@@ -75,6 +76,44 @@
         <div id="reservations-list"></div>
     </div>
 
+    <!-- 5. ADMIN DASHBOARD -->
+    <div id="admin-section" class="card left-align hidden"style="max-width: 1100px !important; width: 95% !important;">
+        <div style="border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
+            <h2>⚙️ Admin Gebruikersbeheer</h2>
+            <p style="margin: 0; font-size: 0.95rem;">Beheer hier het overzicht van alle accounts.</p>
+        </div>
+
+        <!-- Formulier om nieuwe gebruiker toe te voegen -->
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>➕ Nieuwe Gebruiker Aanmaken</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="admin-new-username" placeholder="Gebruikersnaam" style="flex: 1;">
+                <input type="email" id="admin-new-email" placeholder="E-mail" style="flex: 1;">
+                <input type="password" id="admin-new-password" placeholder="Wachtwoord" style="flex: 1;">
+                <select id="admin-new-role" style="padding: 8px;">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+                <button class="btn btn-success" onclick="adminCreateUser()">Toevoegen</button>
+            </div>
+        </div>
+
+        <!-- Tabel met gebruikers -->
+        <h3>Bestaande Gebruikers</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;" border="1" cellpadding="8">
+            <thead>
+            <tr style="background: #eee;">
+                <th>ID</th>
+                <th>Gebruikersnaam</th>
+                <th>E-mail</th>
+                <th>Rol</th>
+                <th>Acties</th>
+            </tr>
+            </thead>
+            <tbody id="admin-users-table"></tbody>
+        </table>
+    </div>
+
 </div>
 
 <footer>
@@ -86,9 +125,18 @@
 
     function updateUI() {
         const navbar = document.getElementById('navbar');
+        const adminBtn = document.getElementById('admin-nav-btn');
+
         if (currentUser) {
-            document.getElementById('user-display').innerText = '👤 ' + currentUser.username;
+            document.getElementById('user-display').innerText = '👤 ' + currentUser.username + ' (' + (currentUser.role || 'USER') + ')';
             navbar.classList.remove('hidden');
+
+            // Toon admin-knop alleen als de gebruiker de ADMIN-rol heeft
+            if (currentUser.role === 'ADMIN') {
+                adminBtn.classList.remove('hidden');
+            } else {
+                adminBtn.classList.add('hidden');
+            }
         } else {
             navbar.classList.add('hidden');
         }
@@ -99,11 +147,13 @@
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('catalog-section').classList.add('hidden');
         document.getElementById('reservations-section').classList.add('hidden');
+        document.getElementById('admin-section').classList.add('hidden');
 
         document.getElementById(sectionId).classList.remove('hidden');
 
         if (sectionId === 'catalog-section') loadBooks();
         if (sectionId === 'reservations-section') loadReservations();
+        if (sectionId === 'admin-section') loadAdminUsers();
     }
 
     function login() {
@@ -123,7 +173,13 @@
                 currentUser = user;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 updateUI();
-                showSection('catalog-section');
+
+                // Stuur een Admin automatisch door naar het Admin Dashboard
+                if (currentUser.role === 'ADMIN') {
+                    showSection('admin-section');
+                } else {
+                    showSection('catalog-section');
+                }
             })
             .catch(err => {
                 const msg = document.getElementById('login-msg');
@@ -139,6 +195,73 @@
         showSection('welcome-section');
     }
 
+    /* --- ADMIN FUNCTIONALITEITEN --- */
+    function loadAdminUsers() {
+        fetch('/api/users')
+            .then(res => res.json())
+            .then(users => {
+                const tbody = document.getElementById('admin-users-table');
+                tbody.innerHTML = '';
+                users.forEach(u => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${u.id}</td>
+                            <td>${u.username}</td>
+                            <td>${u.email || '-'}</td>
+                            <td><strong>${u.role || 'USER'}</strong></td>
+                            <td>
+                                <button class="btn btn-danger" onclick="adminDeleteUser(${u.id})">🗑️ Verwijderen</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+    }
+
+    function adminCreateUser() {
+        const username = document.getElementById('admin-new-username').value.trim();
+        const email = document.getElementById('admin-new-email').value.trim();
+        const password = document.getElementById('admin-new-password').value;
+        const role = document.getElementById('admin-new-role').value;
+
+        if (!username || !password) {
+            alert('Vul minimaal een gebruikersnaam en wachtwoord in.');
+            return;
+        }
+
+        fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password, role })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Aanmaken mislukt');
+                return res.json();
+            })
+            .then(() => {
+                alert('Gebruiker aangemaakt!');
+                document.getElementById('admin-new-username').value = '';
+                document.getElementById('admin-new-email').value = '';
+                document.getElementById('admin-new-password').value = '';
+                loadAdminUsers();
+            })
+            .catch(err => alert(err.message));
+    }
+
+    function adminDeleteUser(id) {
+        if (confirm('Weet je zeker dat je deze gebruiker wilt verwijderen?')) {
+            fetch('/api/users/' + id, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) {
+                        loadAdminUsers();
+                    } else {
+                        alert('Kon gebruiker niet verwijderen.');
+                    }
+                });
+        }
+    }
+
+    /* --- BOEKEN & RESERVERINGEN LOGICA --- */
     function loadBooks() {
         fetch('/api/books')
             .then(res => res.json())
@@ -267,7 +390,11 @@
     // Init opstart
     updateUI();
     if (currentUser) {
-        showSection('catalog-section');
+        if (currentUser.role === 'ADMIN') {
+            showSection('admin-section');
+        } else {
+            showSection('catalog-section');
+        }
     } else {
         showSection('welcome-section');
     }

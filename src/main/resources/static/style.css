@@ -58,44 +58,45 @@ nav h2 {
 
 /* Hoofdcontainer */
 .container {
-    margin: 20px 0;
+    margin: 20px auto;
     padding: 20px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     width: 100%;
+    max-width: 100%;
 }
 
-/* Kaarten (Schermen) */
+/* Standaard Kaarten (zoals Login & Welkom - smaller) */
 .card {
-    background: #fffaf0;
-    border: 1px solid #d7ccc8;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(62, 39, 35, 0.08);
-    width: 100%;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     max-width: 500px;
-    text-align: center;
-    box-sizing: border-box;
+    width: 100%;
+    margin: 20px auto;
 }
-/* catalog-section en reservations-section vullen het hele scherm van links naar rechts */
+
+/* Catalogus, Reserveringen en Admin-dashboard (Breed over het scherm) */
 #catalog-section,
-#reservations-section {
-    max-width: 100% !important;
-    width: 100% !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 40px !important;
+#reservations-section,
+#admin-section {
+    max-width: 1100px !important;
+    width: 95% !important;
+    margin: 20px auto !important;
+    background: #ffffff !important;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    padding: 30px !important;
 }
 
 .card.left-align {
     text-align: left;
 }
 
-h1, h2 {
+h1, h2, h3 {
     color: #2c1810;
     margin-bottom: 15px;
 }
@@ -119,19 +120,34 @@ label {
     color: #4e342e;
 }
 
-input[type="text"], input[type="password"], input[type="email"] {
+input[type="text"], input[type="password"], input[type="email"], select {
     width: 100%;
     padding: 12px;
     border: 1px solid #bcaaa4;
     border-radius: 8px;
     font-size: 1rem;
     background-color: #ffffff;
+    color: #3e2723;
 }
 
-input:focus {
+input:focus, select:focus {
     outline: none;
     border-color: #6d4c41;
     box-shadow: 0 0 5px rgba(109, 76, 65, 0.3);
+}
+
+/* Specifieke fix voor het formulier binnen het Admin Dashboard */
+#admin-section div[style*="display: flex"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+#admin-section input,
+#admin-section select {
+    flex: 1;
+    min-width: 180px; /* Zorgt dat velden zoals 'Ge', 'E-r' breed genoeg worden */
 }
 
 /* Knoppen */
@@ -173,6 +189,33 @@ input:focus {
 }
 .btn-secondary:hover {
     background-color: #795548;
+}
+
+/* Tabellen voor Admin Beheer */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+th, td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #d7ccc8;
+}
+
+th {
+    background-color: #4e342e;
+    color: #f5efe6;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #fcf9f5;
 }
 
 /* Boeken Grid */
@@ -253,6 +296,7 @@ footer {
     color: #6d4c41;
     font-size: 0.85rem;
 }
+
 /* Hoeveelheid selector en knoppen */
 .quantity-container {
     display: flex;
@@ -288,11 +332,12 @@ footer {
     font-weight: bold;
     font-size: medium;
 }
+
 /* Stijl voor de winkelwagenknop met een bruine rand */
 .btn-winkelwagen {
     background-color: #fffaf0;
     color: #4e342e;
-    border: 2px solid #4e342e; /* Dit zorgt voor de bruine rand */
+    border: 2px solid #4e342e;
     padding: 10px 15px;
     border-radius: 8px;
     font-weight: bold;
@@ -302,13 +347,11 @@ footer {
     transition: all 0.2s ease;
 }
 
-/* Effect wanneer je er met de muis overgaat */
 .btn-winkelwagen:hover:not(:disabled) {
     background-color: #4e342e;
     color: #fffaf0;
 }
 
-/* Stijl voor wanneer het boek uitverkocht is (disabled) */
 .btn-winkelwagen:disabled {
     background-color: #f5f2eb;
     border: 2px solid #d7ccc8;
