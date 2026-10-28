@@ -57,6 +57,9 @@
 
     <!-- 3. CATALOGUS / BOEKENWEERGAVE -->
     <div id="catalog-section" class="card left-align hidden">
+        <!-- VAK VOOR ADMIN BERICHTEN -->
+        <div id="user-notifications"></div>
+
         <div style="border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
             <h2>📖 Boekencatalogus</h2>
             <p style="margin: 0; font-size: 0.95rem;">Bekijk ons assortiment en reserveer direct.</p>
@@ -77,20 +80,20 @@
     </div>
 
     <!-- 5. ADMIN DASHBOARD -->
-    <div id="admin-section" class="card left-align hidden"style="max-width: 1100px !important; width: 95% !important;">
+    <div id="admin-section" class="card left-align hidden" style="max-width: 1100px !important; width: 95% !important;">
         <div style="border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
             <h2>⚙️ Admin Gebruikersbeheer</h2>
             <p style="margin: 0; font-size: 0.95rem;">Beheer hier het overzicht van alle accounts.</p>
         </div>
 
         <!-- Formulier om nieuwe gebruiker toe te voegen -->
-        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <div style="background: #fdfbf7; padding: 15px; border-radius: 8px; border: 1px solid #d7ccc8; margin-bottom: 20px;">
             <h3>➕ Nieuwe Gebruiker Aanmaken</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="text" id="admin-new-username" placeholder="Gebruikersnaam" style="flex: 1;">
-                <input type="email" id="admin-new-email" placeholder="E-mail" style="flex: 1;">
-                <input type="password" id="admin-new-password" placeholder="Wachtwoord" style="flex: 1;">
-                <select id="admin-new-role" style="padding: 8px;">
+                <input type="text" id="admin-new-username" placeholder="Gebruikersnaam" style="flex: 1; min-width: 150px;">
+                <input type="email" id="admin-new-email" placeholder="E-mail" style="flex: 1; min-width: 180px;">
+                <input type="password" id="admin-new-password" placeholder="Wachtwoord" style="flex: 1; min-width: 150px;">
+                <select id="admin-new-role" style="padding: 8px; min-width: 100px;">
                     <option value="USER">USER</option>
                     <option value="ADMIN">ADMIN</option>
                 </select>
@@ -112,6 +115,19 @@
             </thead>
             <tbody id="admin-users-table"></tbody>
         </table>
+
+        <!-- BERICHT VERSTUREN SECTIE -->
+        <h3 style="margin-top: 30px;">✉️ Bericht Sturen naar Gebruiker</h3>
+        <div style="background: #fdfbf7; padding: 15px; border-radius: 8px; border: 1px solid #d7ccc8; margin-top: 10px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <select id="msg-recipient" style="padding: 10px; flex: 1; min-width: 180px;">
+                    <option value="">Laden...</option>
+                </select>
+                <input type="text" id="msg-content" placeholder="Typ je bericht hier..." style="flex: 2; min-width: 250px;">
+                <button class="btn btn-success" onclick="sendAdminMessage()">Verstuur</button>
+            </div>
+            <p id="send-msg-status" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
+        </div>
     </div>
 
 </div>
@@ -131,7 +147,6 @@
             document.getElementById('user-display').innerText = '👤 ' + currentUser.username + ' (' + (currentUser.role || 'USER') + ')';
             navbar.classList.remove('hidden');
 
-            // Toon admin-knop alleen als de gebruiker de ADMIN-rol heeft
             if (currentUser.role === 'ADMIN') {
                 adminBtn.classList.remove('hidden');
             } else {
@@ -151,9 +166,15 @@
 
         document.getElementById(sectionId).classList.remove('hidden');
 
-        if (sectionId === 'catalog-section') loadBooks();
+        if (sectionId === 'catalog-section') {
+            loadBooks();
+            loadUserMessages();
+        }
         if (sectionId === 'reservations-section') loadReservations();
-        if (sectionId === 'admin-section') loadAdminUsers();
+        if (sectionId === 'admin-section') {
+            loadAdminUsers();
+            loadUsersForMessage();
+        }
     }
 
     function login() {
@@ -174,7 +195,6 @@
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 updateUI();
 
-                // Stuur een Admin automatisch door naar het Admin Dashboard
                 if (currentUser.role === 'ADMIN') {
                     showSection('admin-section');
                 } else {
@@ -244,6 +264,7 @@
                 document.getElementById('admin-new-email').value = '';
                 document.getElementById('admin-new-password').value = '';
                 loadAdminUsers();
+                loadUsersForMessage();
             })
             .catch(err => alert(err.message));
     }
@@ -254,11 +275,102 @@
                 .then(res => {
                     if (res.ok) {
                         loadAdminUsers();
+                        loadUsersForMessage();
                     } else {
                         alert('Kon gebruiker niet verwijderen.');
                     }
                 });
         }
+    }
+
+    /* --- BERICHTENSYSTEEM --- */
+    function loadUsersForMessage() {
+        fetch('/api/users')
+            .then(res => res.json())
+            .then(users => {
+                const select = document.getElementById('msg-recipient');
+                if (!select) return;
+                select.innerHTML = '<option value="">-- Kies een ontvanger --</option>';
+                users.forEach(u => {
+                    if (u.role !== 'ADMIN') {
+                        select.innerHTML += `<option value="${u.username}">${u.username} (${u.email || 'Geen email'})</option>`;
+                    }
+                });
+            });
+    }
+
+    function sendAdminMessage() {
+        const recipientUsername = document.getElementById('msg-recipient').value;
+        const content = document.getElementById('msg-content').value.trim();
+        const status = document.getElementById('send-msg-status');
+
+        if (!recipientUsername || !content) {
+            status.innerText = 'Selecteer een gebruiker en vul een bericht in.';
+            status.style.color = '#c62828';
+            return;
+        }
+
+        fetch('/api/messages', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recipientUsername, content })
+        })
+            .then(res => {
+                if (res.ok) {
+                    status.innerText = 'Bericht succesvol verzonden!';
+                    status.style.color = '#2e7d32';
+                    document.getElementById('msg-content').value = '';
+                } else {
+                    throw new Error('Verzenden mislukt');
+                }
+            })
+            .catch(err => {
+                status.innerText = 'Fout: ' + err.message;
+                status.style.color = '#c62828';
+            });
+    }
+
+    function loadUserMessages() {
+        if (!currentUser || currentUser.role === 'ADMIN') return;
+
+        fetch('/api/messages?username=' + encodeURIComponent(currentUser.username))
+            .then(res => res.json())
+            .then(messages => {
+                const container = document.getElementById('user-notifications');
+                if (!container) return;
+                container.innerHTML = '';
+
+                if (messages.length > 0) {
+                    let html = `<div style="background: #fff3e0; border: 1px solid #ffb74d; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: #e65100; font-size: 1.1rem; margin-bottom: 10px;">💬 Berichten van de Beheerder:</h3>`;
+
+                    messages.forEach(m => {
+                        html += `
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; border: 1px solid #ffe0b2; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px;">
+                                <span style="color: #4e342e; font-size: 0.95rem;">• ${m.content}</span>
+                                <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="dismissMessage(${m.id})">Gelezen / Weg</button>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                    container.innerHTML = html;
+                }
+            });
+    }
+
+    function dismissMessage(messageId) {
+        fetch('/api/messages/' + messageId, {
+            method: 'DELETE'
+        })
+            .then(res => {
+                if (res.ok) {
+                    loadUserMessages();
+                } else {
+                    alert('Kon het bericht niet verwijderen.');
+                }
+            })
+            .catch(err => console.error('Fout:', err));
     }
 
     /* --- BOEKEN & RESERVERINGEN LOGICA --- */
@@ -347,7 +459,7 @@
             .then(reservations => {
                 const list = document.getElementById('reservations-list');
                 list.innerHTML = '';
-                // Als de gebruiker ADMIN is, toon ALLE reserveringen. Anders alleen die van de ingelogde gebruiker.
+
                 const targetReservations = (currentUser.role === 'ADMIN')
                     ? reservations
                     : reservations.filter(r => r.user && r.user.id === currentUser.id);
@@ -362,7 +474,6 @@
                         ? '<span class="badge badge-confirmed">Bevestigd</span>'
                         : '<span class="badge badge-pending">In afwachting</span>';
 
-                    // Als het een admin is, tonen we ook welke gebruiker de reservering heeft gemaakt
                     const userInfo = (currentUser.role === 'ADMIN' && r.user)
                         ? `<br><small style="color: #6d4c41;">Reservering van: <strong>${r.user.username}</strong></small>`
                         : '';
