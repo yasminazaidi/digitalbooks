@@ -15,7 +15,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    // 1. Alle gebruikers ophalen (handig voor admin overzicht)
+    // 1. Alle gebruikers ophalen
     @GetMapping
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -47,7 +47,7 @@ public class UserController {
                 user.setRole(updatedUser.getRole());
             }
             userRepository.save(user);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.<Object>ok(user);
         }).orElse(ResponseEntity.badRequest().body("Gebruiker niet gevonden"));
     }
 
