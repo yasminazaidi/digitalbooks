@@ -10,12 +10,15 @@
 }
 
 body {
-    background: linear-gradient(135deg, #f5efe6 0%, #e8dfd8 50%, #dcd0c0 100%);
+    /* Vervang 'jouw-afbeelding-link.jpg' door de daadwerkelijke link van de foto */
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.65), rgba(40, 30, 50, 0.65)),
+    url('https://preview.redd.it/enmdst30lptz.jpg?auto=webp&s=69f40571be9b58e9629065be50aae001959e90f8') no-repeat center center fixed;
+    background-size: cover;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: #3e2723;
-    padding-top: 80px;
+    color: #f8f4f0; /* Lichtere tekstkleur voor betere leesbaarheid op een donkere achtergrond */
+    padding-top: 90px;
 }
 
 /* Navigatiebalk */
@@ -30,9 +33,8 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    box-sizing: border-box;
 }
 
 nav h2 {
@@ -65,21 +67,34 @@ nav h2 {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-width: 100%;
 }
 
-/* Standaard Kaarten (zoals Login & Welkom - smaller) */
+/* Moderne kaart met subtiele laadanimatie en diepere schaduw */
 .card {
     background-color: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(62, 39, 35, 0.12);
+    max-width: 450px;
     width: 100%;
     margin: 20px auto;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
-/* Catalogus, Reserveringen en Admin-dashboard (Breed over het scherm) */
+/* Laadanimatie voor kaarten */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sections voor catalogus, reserveringen & admin */
 #catalog-section,
 #reservations-section,
 #admin-section {
@@ -87,9 +102,10 @@ nav h2 {
     width: 95% !important;
     margin: 20px auto !important;
     background: #ffffff !important;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-    padding: 30px !important;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(62, 39, 35, 0.12) !important;
+    padding: 35px !important;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 .card.left-align {
@@ -128,30 +144,17 @@ input[type="text"], input[type="password"], input[type="email"], select {
     font-size: 1rem;
     background-color: #ffffff;
     color: #3e2723;
+    transition: all 0.2s ease;
 }
 
 input:focus, select:focus {
     outline: none;
     border-color: #6d4c41;
-    box-shadow: 0 0 5px rgba(109, 76, 65, 0.3);
+    box-shadow: 0 0 8px rgba(109, 76, 65, 0.25);
 }
 
-/* Specifieke fix voor het formulier binnen het Admin Dashboard */
-#admin-section div[style*="display: flex"] {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-}
-
-#admin-section input,
-#admin-section select {
-    flex: 1;
-    min-width: 180px; /* Zorgt dat velden zoals 'Ge', 'E-r' breed genoeg worden */
-}
-
-/* Knoppen */
-.btn {
+/* Knoppen met moderne hover/omhoog-zweef animatie */
+.btn, button, .btn-login {
     background-color: #6d4c41;
     color: white;
     border: none;
@@ -160,16 +163,20 @@ input:focus, select:focus {
     cursor: pointer;
     font-weight: bold;
     font-size: 1rem;
-    transition: background 0.2s, transform 0.1s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(109, 76, 65, 0.25);
+    display: inline-block;
 }
 
-.btn:hover {
-    background-color: #5d4c41;
-    transform: translateY(-1px);
+.btn:hover, button:hover, .btn-login:hover {
+    background-color: #4e342e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(78, 52, 46, 0.35);
 }
 
 .btn-success {
     background-color: #388e3c;
+    box-shadow: 0 4px 10px rgba(56, 142, 60, 0.25);
 }
 .btn-success:hover {
     background-color: #2e7d32;
@@ -179,6 +186,7 @@ input:focus, select:focus {
     background-color: #c62828;
     padding: 8px 16px;
     font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.25);
 }
 .btn-danger:hover {
     background-color: #b71c1c;
@@ -191,7 +199,7 @@ input:focus, select:focus {
     background-color: #795548;
 }
 
-/* Tabellen voor Admin Beheer */
+/* Tabellen */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -229,13 +237,19 @@ tr:hover {
 
 .book-card {
     background: #ffffff;
-    border: 1px solid #3e2723;
-    border-radius: 10px;
+    border: 1px solid #d7ccc8;
+    border-radius: 12px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.book-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 .book-card h3 {
@@ -284,6 +298,11 @@ tr:hover {
     font-weight: 600;
     margin-top: 15px;
     font-size: 0.95rem;
+    box-shadow: none;
+}
+.link-btn:hover {
+    transform: none;
+    color: #3e2723;
 }
 
 .hidden {
@@ -292,12 +311,12 @@ tr:hover {
 
 footer {
     text-align: center;
-    padding: 15px;
+    padding: 20px;
     color: #6d4c41;
     font-size: 0.85rem;
 }
 
-/* Hoeveelheid selector en knoppen */
+/* Hoeveelheid selector */
 .quantity-container {
     display: flex;
     align-items: center;
@@ -317,10 +336,12 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: none;
 }
 
 .qty-btn:hover {
     background-color: #d7ccc8;
+    transform: none;
 }
 
 .qty-input {
@@ -333,7 +354,7 @@ footer {
     font-size: medium;
 }
 
-/* Stijl voor de winkelwagenknop met een bruine rand */
+/* Winkelwagenknop */
 .btn-winkelwagen {
     background-color: #fffaf0;
     color: #4e342e;
@@ -350,6 +371,7 @@ footer {
 .btn-winkelwagen:hover:not(:disabled) {
     background-color: #4e342e;
     color: #fffaf0;
+    transform: translateY(-2px);
 }
 
 .btn-winkelwagen:disabled {
@@ -357,4 +379,6 @@ footer {
     border: 2px solid #d7ccc8;
     color: #bcaaa4;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
