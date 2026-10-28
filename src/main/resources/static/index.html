@@ -11,7 +11,7 @@
 
 <!-- Navigatiebalk (Zichtbaar na inloggen) -->
 <nav id="navbar" class="hidden">
-    <h2 onclick="showSection('catalog-section')">📚 Digital Books</h2>
+    <h2 onclick="showSection('catalog-section')" style="cursor: pointer;">📚 Digital Books</h2>
     <div class="nav-right">
         <span id="user-display" class="user-badge"></span>
         <button id="admin-nav-btn" class="btn btn-warning hidden" onclick="showSection('admin-section')">⚙️ Admin Beheer</button>
@@ -62,7 +62,7 @@
 
         <div style="border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
             <h2>📖 Boekencatalogus</h2>
-            <p style="margin: 0; font-size: 0.95rem;">Bekijk ons assortiment en reserveer direct.</p>
+            <p style="margin: 0; font-size: 0.95rem;">Bekijk ons assortiment, reserveer direct of klik op een boektitel om de reviews te bekijken.</p>
         </div>
         <div id="book-grid" class="book-grid"></div>
     </div>
@@ -72,7 +72,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d7ccc8; padding-bottom: 15px; margin-bottom: 20px;">
             <div>
                 <h2>🎫 Mijn Reserveringen</h2>
-                <p style="margin: 0; font-size: 0.95rem;">Beheer hieronder je gereserveerde boeken.</p>
+                <p style="margin: 0; font-size: 0.95rem;">Beheer hieronder je reserveringen en schrijf reviews bij goedgekeurde boeken.</p>
             </div>
             <button class="btn btn-secondary" onclick="showSection('catalog-section')">← Terug naar Catalogus</button>
         </div>
@@ -132,9 +132,40 @@
 
 </div>
 
-<footer>
-    &copy; 2026 Digital Books Examenproject
-</footer>
+<!-- REVIEW MODAL (Nette pop-up in plaats van browser alert/prompt) -->
+<div id="review-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+        <h3 id="modal-title" style="margin-top: 0; color: #3e2723;">Review Schrijven</h3>
+
+        <!-- Formulier om review in te vullen -->
+        <div id="review-form-container">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Score (1 t/m 5 sterren):</label>
+                <select id="review-score" style="width: 100%; padding: 8px; border: 1px solid #d7ccc8; border-radius: 6px;">
+                    <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                    <option value="4">⭐⭐⭐⭐ (4)</option>
+                    <option value="3">⭐⭐⭐ (3)</option>
+                    <option value="2">⭐⭐ (2)</option>
+                    <option value="1">⭐ (1)</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Jouw review:</label>
+                <textarea id="review-text" rows="4" placeholder="Schrijf hier je ervaring met dit boek..." style="width: 100%; padding: 8px; border: 1px solid #d7ccc8; border-radius: 6px; resize: vertical;"></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-secondary" onclick="closeReviewModal()">Annuleren</button>
+                <button class="btn btn-success" onclick="submitReviewAction()">Opslaan</button>
+            </div>
+        </div>
+
+        <!-- Container om bestaande reviews weer te geven -->
+        <div id="review-list-container" style="display: none; max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
+        <div id="modal-close-container" style="display: none; text-align: right;">
+            <button class="btn btn-secondary" onclick="closeReviewModal()">Sluiten</button>
+        </div>
+    </div>
+</div>
 
 <script>
     let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
@@ -230,7 +261,7 @@
                             <td>${u.email || '-'}</td>
                             <td><strong>${u.role || 'USER'}</strong></td>
                             <td>
-                                <button class="btn btn-danger" onclick="adminDeleteUser(${u.id})">🗑️ Verwijderen</button>
+                                <button class="btn btn-danger" onclick="adminDeleteUser(${u.id})"> Verwijderen</button>
                             </td>
                         </tr>
                     `;
@@ -342,7 +373,7 @@
 
                 if (messages.length > 0) {
                     let html = `<div style="background: #fff3e0; border: 1px solid #ffb74d; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <h3 style="color: #e65100; font-size: 1.1rem; margin-bottom: 10px;">💬 Berichten van de Beheerder:</h3>`;
+                        <h3 style="color: #e65100; font-size: 1.1rem; margin-bottom: 10px;"> Berichten van de Beheerder:</h3>`;
 
                     messages.forEach(m => {
                         html += `
@@ -389,7 +420,9 @@
                     grid.innerHTML += `
                         <div class="book-card">
                             <div>
-                                <h3>${book.titel}</h3>
+                                <h3 style="cursor: pointer; color: #5d4037;" onclick="showBookDetails(${book.id}, '${book.titel.replace(/'/g, "\\'")}')" title="Klik om reviews te bekijken">
+                                    📖 ${book.titel} <span style="font-size: 0.75rem; color: #8d6e63;">(Reviews)</span>
+                                </h3>
                                 <p style="font-size: 0.85rem; color: #6d4c41; margin-bottom: 3px;"><strong>ISBN:</strong> ${book.isbn || 'Onbekend'}</p>
                                 <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Auteur:</strong> ${book.auteur}</p>
                                 <p style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 15px;">${book.omschrijving || 'Geen omschrijving'}</p>
@@ -408,7 +441,7 @@
                                 </div>
 
                                 <button class="btn-winkelwagen" onclick="reserveBook(${book.id})" ${!isAvailable ? 'disabled' : ''}>
-                                    ${isAvailable ? 'TOEVOEGEN AAN WINKELWAGEN' : 'UITVERKOCHT'}
+                                    ${isAvailable ? 'TOEVOEGEN AAN RESERVERING' : 'UITVERKOCHT'}
                                 </button>
                             </div>
                         </div>
@@ -481,12 +514,19 @@
                     let adminActions = '';
                     if (currentUser.role === 'ADMIN') {
                         if (!r.bevestigd) {
-                            adminActions = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.85rem;" onclick="confirmReservation(${r.id})">✅ Zet op: Mag ophalen</button>`;
+                            adminActions = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.85rem;" onclick="confirmReservation(${r.id})">Zet op: Mag ophalen</button>`;
                         } else {
                             adminActions = `<span style="font-size: 0.85rem; color: #2e7d32; font-weight: bold;">✔ Klaar voor afhalen</span>`;
                         }
                     } else {
-                        adminActions = `<button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.85rem;" onclick="cancelReservation(${r.id})">🗑️ Annuleren</button>`;
+                        let reviewButton = '';
+                        if (r.bevestigd && r.book) {
+                            reviewButton = `<button class="btn btn-success" style="padding: 5px 10px; font-size: 0.8rem; margin-right: 5px;" onclick="submitReview(${r.book.id})">Review schrijven</button>`;
+                        }
+                        adminActions = `
+                            ${reviewButton}
+                            <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.85rem;" onclick="cancelReservation(${r.id})">Annuleren</button>
+                        `;
                     }
 
                     list.innerHTML += `
@@ -532,6 +572,89 @@
                     }
                 });
         }
+    }
+
+    /* --- REVIEW MODAL LOGICA --- */
+    let activeReviewBookId = null;
+
+    function submitReview(bookId) {
+        if (!currentUser) return;
+        activeReviewBookId = bookId;
+
+        document.getElementById('modal-title').innerText = ' Review Schrijven';
+        document.getElementById('review-form-container').style.display = 'block';
+        document.getElementById('review-list-container').style.display = 'none';
+        document.getElementById('modal-close-container').style.display = 'none';
+
+        document.getElementById('review-text').value = '';
+        document.getElementById('review-score').value = '5';
+
+        document.getElementById('review-modal').style.display = 'flex';
+    }
+
+    function submitReviewAction() {
+        const score = document.getElementById('review-score').value;
+        const tekst = document.getElementById('review-text').value.trim();
+
+        if (!tekst) {
+            alert("Schrijf alstublieft een korte beoordeling.");
+            return;
+        }
+
+        fetch(`/api/reviews?userId=${currentUser.id}&bookId=${activeReviewBookId}&score=${score}&tekst=${encodeURIComponent(tekst)}`, {
+            method: 'POST'
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("Bedankt! Je review is succesvol geplaatst.");
+                    closeReviewModal();
+                } else {
+                    alert("Fout bij het plaatsen van de review.");
+                }
+            })
+            .catch(err => alert("Fout: " + err.message));
+    }
+
+    function showBookDetails(bookId, bookTitle) {
+        fetch('/api/reviews/book/' + bookId)
+            .then(res => res.json())
+            .then(reviews => {
+                document.getElementById('modal-title').innerText = `📖 Reviews voor: ${bookTitle}`;
+                document.getElementById('review-form-container').style.display = 'none';
+
+                const listContainer = document.getElementById('review-list-container');
+                listContainer.style.display = 'block';
+                listContainer.innerHTML = '';
+
+                if (reviews.length === 0) {
+                    listContainer.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Nog geen reviews geschreven voor dit boek.</p>';
+                } else {
+                    reviews.forEach(r => {
+                        const stars = '⭐'.repeat(r.score);
+                        const username = r.user ? r.user.username : 'Anoniem';
+                        listContainer.innerHTML += `
+                            <div style="background: #fdfbf7; border: 1px solid #d7ccc8; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <strong style="color: #3e2723;">👤 ${username}</strong>
+                                    <span style="color: #f57f17; font-size: 0.9rem;">${stars} (${r.score}/5)</span>
+                                </div>
+                                <p style="margin: 0; color: #555; font-size: 0.95rem;">"${r.tekst}"</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('modal-close-container').style.display = 'block';
+                document.getElementById('review-modal').style.display = 'flex';
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Kon reviews niet laden.');
+            });
+    }
+
+    function closeReviewModal() {
+        document.getElementById('review-modal').style.display = 'none';
     }
 
     // Init opstart
