@@ -27,7 +27,7 @@
     <div id="welcome-section" class="card">
         <span style="font-size: 4rem; display: block; margin-bottom: 15px;">📖</span>
         <h1>Digital Books</h1>
-        <p>Welkom bij onze online boekenwinkel. Log in om boeken te ontdekken en reserveringen te beheren.</p>
+        <p>Welkom bij onze online boekenwinkel. Log in om boeken te ontdekken en reserveren</p>
         <div style="display: flex; justify-content: center; gap: 15px;">
             <button class="btn" onclick="showSection('login-section')">Inloggen</button>
         </div>
@@ -551,26 +551,23 @@
         })
             .then(res => {
                 if (res.ok) {
-                    alert('Status bijgewerkt naar "Mag ophalen" en er is automatisch een bericht gestuurd naar de gebruiker!');
-                    loadReservations();
+                    loadReservations(); // Vernieuwt de lijst direct zonder pop-up
                 } else {
-                    alert('Kon de status niet bijwerken.');
+                    console.error('Kon de status niet bijwerken.'); // Optioneel: alleen in de console loggen bij een fout
                 }
             })
             .catch(err => console.error('Fout:', err));
     }
 
     function cancelReservation(reservationId) {
-        if (confirm('Weet je zeker dat je deze reservering wilt annuleren?')) {
-            fetch('/api/reservations/' + reservationId, { method: 'DELETE' })
-                .then(res => {
-                    if (res.ok) {
-                        loadReservations();
-                    } else {
-                        alert('Kon reservering niet verwijderen.');
-                    }
-                });
-        }
+        fetch('/api/reservations/' + reservationId, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) {
+                    loadReservations();
+                } else {
+                    alert('Kon reservering niet verwijderen.');
+                }
+            });
     }
 
     /* --- REVIEW MODAL LOGICA --- */
