@@ -8,6 +8,7 @@ import org.example.boekenwinkel.repository.ReservationRepository;
 import org.example.boekenwinkel.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -54,7 +55,8 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    // Verwijder een reservering (en geef de stock eventueel terug)
+    // Verwijder een reservering en geef de stock weer netjes terug aan het boek
+    @Transactional
     public void deleteReservation(Long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservering niet gevonden"));
@@ -66,6 +68,7 @@ public class ReservationService {
             bookRepository.save(book);
         }
 
+        // Verwijder de reservering uit de database
         reservationRepository.deleteById(id);
     }
 }

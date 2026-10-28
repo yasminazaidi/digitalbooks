@@ -214,6 +214,8 @@ th, td {
     padding: 14px 16px;
     text-align: left;
     border-bottom: 1px solid #d7ccc8;
+    color: #2c1d11;
+    font-weight: 500;
 }
 
 th {

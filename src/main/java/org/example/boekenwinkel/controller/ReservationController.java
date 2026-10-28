@@ -8,6 +8,7 @@ import org.example.boekenwinkel.repository.BookRepository;
 import org.example.boekenwinkel.repository.MessageRepository;
 import org.example.boekenwinkel.repository.ReservationRepository;
 import org.example.boekenwinkel.repository.UserRepository;
+import org.example.boekenwinkel.service.ReservationService; // Geïmporteerd
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,9 @@ public class ReservationController {
 
     @Autowired
     private MessageRepository messageRepository;
+
+    @Autowired
+    private ReservationService reservationService; // Toegevoegd zodat de service werkt
 
     @GetMapping
     public List<Reservation> getAllReservations() {
@@ -66,11 +70,11 @@ public class ReservationController {
         reservation.setBevestigd(true);
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        // Automatisch een bericht sturen naar de gebruiker via setters (veilig voor elke Message constructor)
+        // Automatisch een bericht sturen naar de gebruiker via setters
         if (reservation.getUser() != null && reservation.getBook() != null) {
             Message message = new Message();
             message.setRecipientUsername(reservation.getUser().getUsername());
-            message.setContent("Goed nieuws! Je reservering voor het boek '" + reservation.getBook().getTitel() + "' je mag die morgen komen ophalen om 14u📚");
+            message.setContent("Goed nieuws! Je reservering voor het boek '" + reservation.getBook().getTitel() + "' mag je morgen komen ophalen om 14u 📚");
             messageRepository.save(message);
         }
 
@@ -78,7 +82,9 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteReservation(@PathVariable Long id) {
-        reservationRepository.deleteById(id);
+    public ResponseEntity<?> cancelReservation(@PathVariable Long id) {
+        // Roept nu netjes de service aan die de voorraad terugzet en de reservering verwijdert
+        reservationService.deleteReservation(id);
+        return ResponseEntity.ok().build();
     }
 }

@@ -378,7 +378,7 @@
                         html += `
                             <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; border: 1px solid #ffe0b2; padding: 10px 12px; border-radius: 6px; margin-bottom: 8px;">
                                 <span style="color: #4e342e; font-size: 0.95rem;">• ${m.content}</span>
-                                <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="dismissMessage(${m.id})">Gelezen / Weg</button>
+                                <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="dismissMessage(${m.id})">Gelezen </button>
                             </div>
                         `;
                     });
@@ -503,7 +503,7 @@
 
                 targetReservations.forEach(r => {
                     const statusBadge = r.bevestigd
-                        ? '<span class="badge badge-confirmed" style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-weight: bold;">🟢 Goedgekeurd / Mag ophalen</span>'
+                        ? '<span class="badge badge-confirmed" style="background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-weight: bold;">🟢 Mag opgehaald worden</span>'
                         : '<span class="badge badge-pending" style="background: #fff3e0; color: #e65100; padding: 4px 8px; border-radius: 4px; font-weight: bold;">⏳ In afwachting</span>';
 
                     const userInfo = (currentUser.role === 'ADMIN' && r.user)
